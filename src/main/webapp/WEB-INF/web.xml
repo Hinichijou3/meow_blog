@@ -169,6 +169,35 @@
 	    <servlet-name>UpdatePasswordServlet</servlet-name>
 	    <url-pattern>/update-password</url-pattern>
 	</servlet-mapping>
-	    
+	
+	<!-- 广告点击追踪Servlet -->
+	<servlet>
+	    <servlet-name>AdTrackServlet</servlet-name>
+	    <servlet-class>com.yourblog.controller.AdTrackServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>AdTrackServlet</servlet-name>
+	    <url-pattern>/ad-track</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 删除广告Servlet -->
+	<servlet>
+	    <servlet-name>AdDeleteServlet</servlet-name>
+	    <servlet-class>com.yourblog.controller.AdDeleteServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>AdDeleteServlet</servlet-name>
+	    <url-pattern>/delete-ad</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 广告Servlet -->
+	<servlet>
+	    <servlet-name>AdServlet</servlet-name>
+	    <servlet-class>com.yourblog.controller.AdServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>AdServlet</servlet-name>
+	    <url-pattern>/ad</url-pattern>
+	</servlet-mapping>
     
 </web-app>

@@ -91,8 +91,9 @@ public class UserDAO {
         user.setPasswordHash(rs.getString("password_hash"));
         user.setDisplayName(rs.getString("display_name"));
         user.setAvatarUrl(rs.getString("avatar_url"));
-        user.setHeaderImageUrl(rs.getString("header_image_url"));  // 新增
+        user.setHeaderImageUrl(rs.getString("header_image_url"));
         user.setBio(rs.getString("bio"));
+        user.setCoins(rs.getInt("coins")); // 确保这行存在
         user.setCreatedAt(rs.getTimestamp("created_at"));
         user.setUpdatedAt(rs.getTimestamp("updated_at"));
         return user;

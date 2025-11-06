@@ -124,6 +124,47 @@ public class CoinDAO {
         }
     }
     
+    /**
+     * 获取用户当前硬币数量
+     */
+    public int getUserCoins(int userId) {
+        String sql = "SELECT coins FROM users WHERE id = ?";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt("coins");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    /**
+     * 直接更新用户硬币数量
+     */
+    public boolean updateUserCoins(int userId, int coins) {
+        String sql = "UPDATE users SET coins = ? WHERE id = ?";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, coins);
+            stmt.setInt(2, userId);
+            
+            int affectedRows = stmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            System.err.println("更新用户硬币失败: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    
     // 获取用户今日是否已登录领取硬币
     public boolean hasLoggedInToday(int userId) {
         String sql = "SELECT last_login_date FROM users WHERE id = ?";

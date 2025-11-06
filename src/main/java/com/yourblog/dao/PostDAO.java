@@ -1,6 +1,7 @@
 package com.yourblog.dao;
 
 import com.yourblog.model.Post;
+import com.yourblog.model.Tag;
 import com.yourblog.util.DatabaseUtil;
 import java.sql.*;
 import java.util.ArrayList;
@@ -53,7 +54,6 @@ public class PostDAO {
 	    System.out.println("=== 文章列表获取完成 ===");
 	    return posts;
 	}
-	
 	
     public List<Post> getPostsByUserId(int userId) {
         List<Post> posts = new ArrayList<>();
@@ -162,9 +162,7 @@ public class PostDAO {
         return false;
     }
     
-    /**
-     * 删除文章
-     */
+
     /**
      * 删除文章
      */
@@ -291,5 +289,158 @@ public class PostDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+    
+    /**
+     * 搜索文章（标题、内容、标签）
+     */
+    public List<Post> searchPosts(String keyword) {
+        List<Post> posts = new ArrayList<>();
+        String sql = "SELECT DISTINCT p.*, u.username, u.display_name, u.avatar_url " +
+                    "FROM posts p " +
+                    "JOIN users u ON p.user_id = u.id " +
+                    "LEFT JOIN post_tags pt ON p.id = pt.post_id " +
+                    "LEFT JOIN tags t ON pt.tag_id = t.id " +
+                    "WHERE p.status = 'published' " +
+                    "AND (p.title LIKE ? OR p.content LIKE ? OR p.excerpt LIKE ? OR t.name LIKE ?) " +
+                    "ORDER BY p.created_at DESC";
+        
+        System.out.println("=== 搜索文章 ===");
+        System.out.println("关键词: " + keyword);
+        System.out.println("SQL: " + sql);
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            String searchPattern = "%" + keyword + "%";
+            stmt.setString(1, searchPattern);
+            stmt.setString(2, searchPattern);
+            stmt.setString(3, searchPattern);
+            stmt.setString(4, searchPattern);
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            int count = 0;
+            while (rs.next()) {
+                count++;
+                Post post = extractPostFromResultSet(rs);
+                post.setAuthor(rs.getString("display_name"));
+                
+                // 获取文章的标签
+                List<String> tags = getTagsByPostId(post.getId());
+                post.setTags(tags);
+                
+                posts.add(post);
+            }
+            
+            System.out.println("✅ 搜索到 " + count + " 篇文章");
+            
+        } catch (SQLException e) {
+            System.err.println("❌ 搜索文章失败: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return posts;
+    }
+    
+    /**
+     * 根据标签搜索文章
+     */
+    public List<Post> searchPostsByTag(String tagName) {
+        List<Post> posts = new ArrayList<>();
+        String sql = "SELECT p.*, u.username, u.display_name, u.avatar_url " +
+                    "FROM posts p " +
+                    "JOIN users u ON p.user_id = u.id " +
+                    "JOIN post_tags pt ON p.id = pt.post_id " +
+                    "JOIN tags t ON pt.tag_id = t.id " +
+                    "WHERE t.name = ? AND p.status = 'published' " +
+                    "ORDER BY p.created_at DESC";
+        
+        System.out.println("=== 根据标签搜索文章 ===");
+        System.out.println("标签: " + tagName);
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+               
+               stmt.setString(1, tagName);
+               ResultSet rs = stmt.executeQuery();
+               
+               int count = 0;
+               while (rs.next()) {
+                   count++;
+                   Post post = extractPostFromResultSet(rs);
+                   post.setAuthor(rs.getString("display_name"));
+                   
+                   // 获取文章的标签
+                   List<String> tags = getTagsByPostId(post.getId());
+                   post.setTags(tags);
+                   
+                   posts.add(post);
+               }
+               
+               System.out.println("✅ 找到 " + count + " 篇带有标签 '" + tagName + "' 的文章");
+               
+           } catch (SQLException e) {
+               System.err.println("❌ 根据标签搜索失败: " + e.getMessage());
+               e.printStackTrace();
+           }
+           
+           return posts;
+       }
+    /**
+     * 获取热门标签
+     */
+    public List<String> getPopularTags(int limit) {
+        List<String> tags = new ArrayList<>();
+        String sql = "SELECT t.name, COUNT(pt.post_id) as count " +
+                    "FROM tags t " +
+                    "JOIN post_tags pt ON t.id = pt.tag_id " +
+                    "GROUP BY t.id, t.name " +
+                    "ORDER BY count DESC " +
+                    "LIMIT ?";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        	
+        	stmt.setInt(1, limit);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                tags.add(rs.getString("name"));
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("❌ 获取热门标签失败: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return tags;
+    }
+    
+    /**
+     * 获取文章的标签列表
+     */
+    public List<String> getTagsByPostId(int postId) {
+        List<String> tags = new ArrayList<>();
+        String sql = "SELECT t.name FROM tags t " +
+                    "JOIN post_tags pt ON t.id = pt.tag_id " +
+                    "WHERE pt.post_id = ?";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, postId);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                tags.add(rs.getString("name"));
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("❌ 获取文章标签失败: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return tags;
     }
 }

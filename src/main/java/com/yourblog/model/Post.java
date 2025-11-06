@@ -1,5 +1,6 @@
 package com.yourblog.model;
 
+import java.util.List;
 import java.util.Date;
 
 public class Post {
@@ -14,7 +15,8 @@ public class Post {
     private int viewCount;
     private String status;
     private int commentCount;
-
+    private List<String> tags;
+    
     // 构造器
     public Post() {}
 
@@ -65,4 +67,7 @@ public class Post {
     
     public int getCommentCount() { return commentCount; }
     public void setCommentCount(int commentCount) { this.commentCount = commentCount; }
+
+    public List<String> getTags() { return tags; }
+    public void setTags(List<String> tags) { this.tags = tags; }
 }

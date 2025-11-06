@@ -13,22 +13,25 @@ public class CoinServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        PrintWriter out = response.getWriter();
         
         if (user == null) {
-            out.print("{\"success\": false, \"message\": \"请先登录\"}");
+            response.sendRedirect("login.jsp");
             return;
         }
         
-        String postIdParam = request.getParameter("postId");
+        String postIdParam = request.getParameter("post_id");
+        String redirectUrl = request.getParameter("redirect_url");
+        
+        System.out.println("CoinServlet - post_id: " + postIdParam + ", user_id: " + (user != null ? user.getId() : "null"));
         
         if (postIdParam == null) {
-            out.print("{\"success\": false, \"message\": \"参数错误\"}");
+            if (redirectUrl != null) {
+                response.sendRedirect(redirectUrl + "&error=参数错误");
+            } else {
+                response.sendRedirect("default.jsp?error=参数错误");
+            }
             return;
         }
         
@@ -39,20 +42,32 @@ public class CoinServlet extends HttpServlet {
             
             // 检查用户是否还有硬币
             if (user.getCoins() <= 0) {
-                out.print("{\"success\": false, \"message\": \"硬币不足\"}");
+                if (redirectUrl != null) {
+                    response.sendRedirect(redirectUrl + "&error=硬币不足");
+                } else {
+                    response.sendRedirect("view-post.jsp?id=" + postId + "&error=硬币不足");
+                }
                 return;
             }
             
             // 检查是否已投币
             if (coinDao.hasCoined(user.getId(), postId)) {
-                out.print("{\"success\": false, \"message\": \"已投过币\"}");
+                if (redirectUrl != null) {
+                    response.sendRedirect(redirectUrl + "&error=已投过币");
+                } else {
+                    response.sendRedirect("view-post.jsp?id=" + postId + "&error=已投过币");
+                }
                 return;
             }
             
             // 获取文章作者信息
             Post post = postDao.getPostById(postId);
             if (post == null) {
-                out.print("{\"success\": false, \"message\": \"文章不存在\"}");
+                if (redirectUrl != null) {
+                    response.sendRedirect(redirectUrl + "&error=文章不存在");
+                } else {
+                    response.sendRedirect("default.jsp?error=文章不存在");
+                }
                 return;
             }
             
@@ -67,13 +82,31 @@ public class CoinServlet extends HttpServlet {
                 user.setCoins(user.getCoins() - 1);
                 session.setAttribute("user", user);
                 
-                int newCount = coinDao.getCoinCount(postId);
-                out.print("{\"success\": true, \"coined\": true, \"count\": " + newCount + ", \"remainingCoins\": " + user.getCoins() + "}");
+                if (redirectUrl != null) {
+                    response.sendRedirect(redirectUrl + "&success=投币成功");
+                } else {
+                    response.sendRedirect("view-post.jsp?id=" + postId + "&success=投币成功");
+                }
             } else {
-                out.print("{\"success\": false, \"message\": \"投币失败\"}");
+                if (redirectUrl != null) {
+                    response.sendRedirect(redirectUrl + "&error=投币失败");
+                } else {
+                    response.sendRedirect("view-post.jsp?id=" + postId + "&error=投币失败");
+                }
             }
         } catch (NumberFormatException e) {
-            out.print("{\"success\": false, \"message\": \"参数错误\"}");
+            if (redirectUrl != null) {
+                response.sendRedirect(redirectUrl + "&error=参数格式错误");
+            } else {
+                response.sendRedirect("default.jsp?error=参数格式错误");
+            }
+        } catch (Exception e) {
+            if (redirectUrl != null) {
+                response.sendRedirect(redirectUrl + "&error=服务器错误");
+            } else {
+                response.sendRedirect("default.jsp?error=服务器错误");
+            }
+            e.printStackTrace();
         }
     }
 }

@@ -453,9 +453,9 @@ String currentTime = sdf.format(new java.util.Date());
                     
                     <div class="contact-info">
                         <h4>📞 联系我们</h4>
-                        <p><strong>管理邮箱:</strong> admin@yourblog.com</p>
+                        <p><strong>管理邮箱:</strong> hnjartworks114514@gmail.com</p>
                         <p><strong>官方QQ群:</strong> 准备中...</p>
-                        <p><strong>GitHub:</strong> <a href="https://github.com/yourblog" target="_blank">github.com/yourblog</a></p>
+                        <p><strong>GitHub:</strong> <a href="https://github.com/Hinichijou3/meow_blog" target="_blank">https://github.com/Hinichijou3/meow_blog</a></p>
                     </div>
                     
                     <h3>🤝 加入我们</h3>
