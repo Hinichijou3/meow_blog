@@ -1,4 +1,4 @@
-# 神的博客
+# meow-blog
 
 ## 项目简介
 - 多用户博客系统
@@ -17,8 +17,8 @@
 - 基于Eclipse IDE运行
 
 ## 项目结构
-仅列出与配置有关的文件（夹）
-神的博客/
+仅列出与配置有关的文件
+test2/
 ├── main
 │ ├── java
 │ │ ├──com
@@ -39,11 +39,11 @@
 
 
 ## 部署步骤
-1. 导入到 Eclipse：File → Import → Existing Projects into Workspace
+1. 作为Maven项目导入到 Eclipse：File → Import → Existing Projects into Workspace
 2. 配置 Tomcat 服务器
 3. 配置数据库连接（数据库脚本位置）
 4. 部署并启动项目
 
 ## 配置说明
-- 下载mysql JDBC驱动，在main.java.com.yourblog.util.DatabaseUtil.java中修改
+- 下载mysql JDBC驱动，修改main.java.com.yourblog.util.DatabaseUtil.java
 
