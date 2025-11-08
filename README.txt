@@ -60,4 +60,9 @@ test2/
 4. 部署并启动项目
 
 ## 配置说明
+<<<<<<< HEAD:README.txt
 - 下载mysql JDBC驱动，修改main.java.com.yourblog.util.DatabaseUtil.java
+=======
+- 下载mysql JDBC驱动，修改main.java.com.yourblog.util.DatabaseUtil.java
+
+>>>>>>> dbbc291db89de91d7638030dc3393d46333611ed:README.md
